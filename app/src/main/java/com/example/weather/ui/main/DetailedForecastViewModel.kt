@@ -14,7 +14,7 @@ class DetailedForecastViewModel : ViewModel() {
     var shortForecast:String? = null
     var detailedForecast:String? = null
     var wind:String? = null
-    var backgroundColor:Int = R.color.dayBackground
+    var textColor:Int = R.color.material_on_surface_emphasis_high_type
 
     val nameVisibility: Int
         get() = if (name == null) View.GONE else View.VISIBLE
@@ -33,7 +33,7 @@ class DetailedForecastViewModel : ViewModel() {
         set(value) {
             field = value
 
-            var nwsForecast = MainActivity.nwsService.forecast.value
+            val nwsForecast = MainActivity.nwsService.forecast.value
             if (nwsForecast != null && nwsForecast.names.count() > index) {
                 val isLowFirst = nwsForecast.names[0] == "Tonight"
                 val isLow = !isLowFirst xor (index % 2 == 0)
@@ -45,7 +45,7 @@ class DetailedForecastViewModel : ViewModel() {
                 shortForecast = nwsForecast.shortForecasts[index]
                 detailedForecast = nwsForecast.detailedForecasts[index]
                 wind = "Wind ${nwsForecast.windDirections[index]} ${nwsForecast.windSpeeds[index]} MPH"
-                backgroundColor = if (isLow) R.color.nightBackground else R.color.dayBackground
+                textColor = if (isLow) R.color.material_on_surface_emphasis_medium else R.color.material_on_surface_emphasis_high_type
             }
         }
 }

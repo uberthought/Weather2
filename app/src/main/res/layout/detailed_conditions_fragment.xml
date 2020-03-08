@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+        <variable name="viewModel" type="com.example.weather.ui.main.DetailedConditionsViewModel"/>
+    </data>
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.MaterialComponents.CardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="8dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="8dp">
+
+            <androidx.constraintlayout.widget.Guideline
+                android:id="@+id/centerGuideline"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                app:layout_constraintGuide_percent="0.5"/>
+
+        <TextView
+            android:id="@+id/title"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+            android:textColor="@{context.getColor(viewModel.textColor)}"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/current_conditions"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Current Conditions" />
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/title"
+                app:layout_constraintBottom_toTopOf="@+id/shortDescription"
+                tools:layout_height="150dp"
+                tools:layout_width="150dp"
+                android:visibility="@{viewModel.iconVisibility}"
+                android:contentDescription="@string/icon" />
+
+            <TextView
+                android:id="@+id/shortDescription"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@{context.getColor(viewModel.textColor)}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/icon"
+                android:text="@{viewModel.shortDescription}"
+                android:visibility="@{viewModel.shortDescriptionVisibility}"
+                tools:text="textDescription" />
+
+            <TextView
+                android:id="@+id/temperature"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@{context.getColor(viewModel.textColor)}"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/shortDescription"
+                android:text="@{viewModel.temperature}"
+                android:visibility="@{viewModel.temperatureVisibility}"
+                tools:text="temperature" />
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/temperature"
+                android:padding="4dp" >
+
+                <TextView
+                    android:id="@+id/wind"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.wind}"
+                    android:visibility="@{viewModel.windVisibility}"
+                    tools:text="wind" />
+
+                <TextView
+                    android:id="@+id/windGust"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.windGust}"
+                    android:visibility="@{viewModel.windGustVisibility}"
+                    tools:text="windGust" />
+
+                <TextView
+                    android:id="@+id/windChill"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.windChill}"
+                    android:visibility="@{viewModel.windChillVisibility}"
+                    tools:text="windChill" />
+
+                <TextView
+                    android:id="@+id/heatIndex"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.heatIndex}"
+                    android:visibility="@{viewModel.heatIndexVisibility}"
+                    tools:text="heatIndex" />
+
+                <TextView
+                    android:id="@+id/pressure"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.pressure}"
+                    android:visibility="@{viewModel.pressureVisibility}"
+                    tools:text="pressure" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/centerGuideline"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/temperature"
+                android:padding="4dp" >
+
+                <TextView
+                    android:id="@+id/dewPoint"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.dewPoint}"
+                    android:visibility="@{viewModel.dewPointVisibility}"
+                    tools:text="dewPoint" />
+
+                <TextView
+                    android:id="@+id/relativeHumidity"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.relativeHumidity}"
+                    android:visibility="@{viewModel.relativeHumidityVisibility}"
+                    tools:text="relativeHumidity" />
+
+                <TextView
+                    android:id="@+id/visibility"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.visibility}"
+                    android:visibility="@{viewModel.visibilityVisibility}"
+                    tools:text="visibility" />
+
+            </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+</layout>

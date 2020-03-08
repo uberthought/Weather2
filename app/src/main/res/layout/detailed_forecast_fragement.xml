@@ -9,10 +9,11 @@
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/detaildForecastCard"
+        style="@style/Widget.MaterialComponents.CardView"
+        app:strokeWidth="1dp"
+        app:strokeColor="@{context.getColor(viewModel.textColor)}"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:strokeColor="@color/colorPrimaryDark"
-        app:strokeWidth="1dp" >
+        android:layout_height="wrap_content">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -20,12 +21,12 @@
             android:padding="8dp" >
 
             <TextView
-                android:id="@+id/name"
+                android:id="@+id/title"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
+                android:textColor="@{context.getColor(viewModel.textColor)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{viewModel.name}"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textStyle="bold"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
@@ -38,22 +39,23 @@
                 android:layout_height="150dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/name"
+                app:layout_constraintTop_toBottomOf="@+id/title"
                 app:layout_constraintBottom_toTopOf="@+id/shortForecast"
                 tools:layout_height="150dp"
                 tools:layout_width="150dp"
-                android:contentDescription="Icon"
+                android:contentDescription="@string/icon"
                 android:visibility="@{viewModel.iconVisibility}" />
 
             <TextView
                 android:id="@+id/shortForecast"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@{context.getColor(viewModel.textColor)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/icon"
                 android:text="@{viewModel.shortForecast}"
-                android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 tools:text="textDescription"
                 android:visibility="@{viewModel.shortForecastVisibility}" />
 
@@ -69,17 +71,19 @@
 
                 <TextView
                     android:id="@+id/temperatureLabel"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:text="@{viewModel.temperatureLabel}"
                     tools:text="Hi" />
 
                 <TextView
                     android:id="@+id/temperature"
+                    android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                    android:textColor="@{context.getColor(viewModel.textColor)}"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:text="@{viewModel.temperature}"
                     tools:text="90F" />
 
@@ -87,6 +91,8 @@
 
             <TextView
                 android:id="@+id/wind"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@{context.getColor(viewModel.textColor)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
@@ -98,6 +104,8 @@
 
             <TextView
                 android:id="@+id/detailedForecast"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@{context.getColor(viewModel.textColor)}"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{viewModel.detailedForecast}"

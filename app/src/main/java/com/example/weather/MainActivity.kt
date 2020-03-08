@@ -9,7 +9,7 @@ import android.os.Looper
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.app.ActivityCompat
 import androidx.work.*
-import com.example.weather.ui.main.ViewPagerFragment
+import com.example.weather.ui.main.ConditionsFragment
 import com.google.android.gms.location.*
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.GlobalScope
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity)
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, ViewPagerFragment())
+                .replace(R.id.container, ConditionsFragment())
                 .commitNow()
         }
 
@@ -61,9 +61,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun requestLocationUpdates() {
-        var fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
 
-        var locationCallback = object: LocationCallback() {
+        val locationCallback = object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 for (location in locationResult.locations) {
