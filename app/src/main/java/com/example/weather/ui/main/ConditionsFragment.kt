@@ -19,7 +19,6 @@ import com.example.weather.databinding.DetailedForecastFragementBinding
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.conditions_fragment.view.*
 
-
 class ConditionsFragment: Fragment() {
 
     lateinit var viewModel: ConditionsViewModel
@@ -29,7 +28,6 @@ class ConditionsFragment: Fragment() {
         val binding = ConditionsFragmentBinding.inflate(layoutInflater)
         binding.lifecycleOwner = this
         binding.viewModel = viewModel
-
 
         val recyclerView = binding.root.recyclerView as RecyclerView
         val itemDecor = DividerItemDecoration(context, LinearLayoutManager.VERTICAL)
@@ -98,7 +96,7 @@ class ConditionsFragment: Fragment() {
                 if (viewModel.icon != null)
                     Picasso.with(context).load(viewModel.icon!!).into(binding.icon)
 
-                val pw = PopupWindow(binding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
+                val pw = PopupWindow(binding.root, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
                 pw.setTouchInterceptor { _, _ ->
                     pw.dismiss()
                     true
@@ -116,7 +114,8 @@ class ConditionsFragment: Fragment() {
                 if (viewModel.icon != null)
                     Picasso.with(context).load(viewModel.icon!!).into(binding.icon)
 
-                val pw = PopupWindow(binding.root, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
+
+                val pw = PopupWindow(binding.root, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
                 pw.setTouchInterceptor { _, _ ->
                     pw.dismiss()
                     true

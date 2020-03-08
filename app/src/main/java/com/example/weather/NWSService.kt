@@ -1,20 +1,13 @@
 package com.example.weather
 
+import android.annotation.SuppressLint
 import android.location.Location
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.json.JSONObject
-import java.lang.Exception
 import java.net.URL
 import java.text.SimpleDateFormat
-import java.time.DateTimeException
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
 import java.util.*
 
 class NWSService {
@@ -66,7 +59,7 @@ class NWSService {
 
     var timestamp: Long? = null
 
-    suspend fun refresh() {
+    fun refresh() {
         // location not set
         if (myLocation == Location(""))
             return
@@ -93,8 +86,9 @@ class NWSService {
         stationId = properties.getString("stationIdentifier")
     }
 
+    @SuppressLint("SimpleDateFormat")
     private fun getConditions() {
-        val url = URL("$baseURL/stations/$stationId/observations/latest?require_qc=false");
+        val url = URL("$baseURL/stations/$stationId/observations/latest?require_qc=false")
         val response = url.readText()
         val obj = JSONObject(response)
         val properties = obj.getJSONObject("properties")
@@ -107,7 +101,7 @@ class NWSService {
         conditions.windDirection = properties.getJSONObject("windDirection").getString("value").toDoubleOrNull()
         conditions.windSpeed = properties.getJSONObject("windSpeed").getString("value").toDoubleOrNull()
         conditions.windGust = properties.getJSONObject("windGust").getString("value").toDoubleOrNull()
-        conditions.icon = properties.getString("icon");
+        conditions.icon = properties.getString("icon")
         conditions.textDescription = properties.getString("textDescription")
         conditions.barometricPressure = properties.getJSONObject("barometricPressure").getString("value").toDoubleOrNull()
         conditions.visibility = properties.getJSONObject("visibility").getString("value").toDoubleOrNull()
@@ -125,7 +119,7 @@ class NWSService {
         if (gridX == null || gridY == null || gridWFO == null)
             getGridPoint()
 
-        val url = URL("$baseURL/gridpoints/$gridWFO/$gridX,$gridY/forecast");
+        val url = URL("$baseURL/gridpoints/$gridWFO/$gridX,$gridY/forecast")
         val response = url.readText()
         val obj = JSONObject(response)
         val properties = obj.getJSONObject("properties")

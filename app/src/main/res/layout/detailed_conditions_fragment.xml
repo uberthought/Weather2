@@ -9,6 +9,8 @@
 
     <com.google.android.material.card.MaterialCardView
         style="@style/Widget.MaterialComponents.CardView"
+        app:strokeWidth="1dp"
+        app:strokeColor="@{context.getColor(viewModel.textColor)}"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="8dp">

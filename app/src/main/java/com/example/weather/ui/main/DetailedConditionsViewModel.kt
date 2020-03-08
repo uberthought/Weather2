@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import com.example.weather.MainActivity
 import com.example.weather.NWSService
 import com.example.weather.R
-import java.text.SimpleDateFormat
 
 class DetailedConditionsViewModel() : ViewModel() {
 
