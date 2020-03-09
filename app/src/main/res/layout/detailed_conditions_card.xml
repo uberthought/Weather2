@@ -93,12 +93,34 @@
                 tools:text="windGust" />
 
             <TextView
-                android:id="@+id/dewPoint"
+                android:id="@+id/windChill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
                 app:layout_constraintTop_toBottomOf="@+id/windGust"
+                android:text="@{viewModel.windChill}"
+                android:visibility="@{TextUtils.isEmpty(viewModel.windChill) ? View.GONE : View.VISIBLE}"
+                tools:text="windGust" />
+
+            <TextView
+                android:id="@+id/heatIndex"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/windChill"
+                android:text="@{viewModel.heatIndex}"
+                android:visibility="@{TextUtils.isEmpty(viewModel.heatIndex) ? View.GONE : View.VISIBLE}"
+                tools:text="windGust" />
+
+            <TextView
+                android:id="@+id/dewPoint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@+id/heatIndex"
                 android:text="@{viewModel.dewPoint}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.dewPoint) ? View.GONE : View.VISIBLE}"
                 tools:text="dewPoint" />
@@ -125,6 +147,42 @@
                 android:text="@{viewModel.shortDescription}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.shortDescription) ? View.GONE : View.VISIBLE}"
                 tools:text="shortDescription"/>
+
+            <TextView
+                android:id="@+id/visibility"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@id/shortDescription"
+                app:layout_constrainedWidth="true"
+                android:text="@{viewModel.visibility}"
+                android:visibility="@{TextUtils.isEmpty(viewModel.visibility) ? View.GONE : View.VISIBLE}"
+                tools:text="visibility"/>
+
+            <TextView
+                android:id="@+id/pressure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@id/visibility"
+                app:layout_constrainedWidth="true"
+                android:text="@{viewModel.pressure}"
+                android:visibility="@{TextUtils.isEmpty(viewModel.pressure) ? View.GONE : View.VISIBLE}"
+                tools:text="pressure"/>
+
+            <TextView
+                android:id="@+id/detailedDescription"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
+                app:layout_constraintTop_toBottomOf="@id/pressure"
+                app:layout_constrainedWidth="true"
+                android:text="@{viewModel.detailedDescription}"
+                android:visibility="@{TextUtils.isEmpty(viewModel.detailedDescription) ? View.GONE : View.VISIBLE}"
+                tools:text="detailedDescription"/>
 
             <ImageView
                 android:id="@+id/icon"

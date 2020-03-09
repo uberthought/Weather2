@@ -2,20 +2,26 @@ package com.example.weather
 
 import android.annotation.SuppressLint
 import android.location.Location
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.json.JSONObject
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
 
 class NWSService {
+    private val TAG = javaClass.kotlin.qualifiedName
+
+
     private var stationId: String? = null
     private var gridX: Int? = null
     private var gridY: Int? = null
     private var gridWFO: String? = null
-    private var myLocation:Location = Location("")
+    private var myLocation:Location? = null
     private var baseURL = "https://api.weather.gov"
 
     class Conditions {
@@ -49,34 +55,33 @@ class NWSService {
     var forecast: MutableLiveData<Forecast> = MutableLiveData()
 
     fun setLocation(location: Location) {
-        if (myLocation.distanceTo(location) > 100  ) {
+        Log.d(TAG, "got update from location service")
+        if (myLocation == null || myLocation!!.distanceTo(location) > 100  ) {
+            Log.d(TAG, "refresking since the location changes by greater than 100m")
             this.myLocation = location
             stationId = null
-            timestamp = null
             GlobalScope.launch { refresh() }
         }
+        else
+            Log.d(TAG, "mot refreshing since the location changes bt at less than 100m")
+
     }
 
-    var timestamp: Long? = null
-
     fun refresh() {
-        // location not set
-        if (myLocation == Location(""))
-            return
+        Log.d(TAG, "starting NWS refresh")
 
-        // too soon
-        if (timestamp != null && Date().time - timestamp!! < 1000 * 60 * 5)
-            return
-
-        timestamp = Date().time
-        getStation()
-        getConditions()
-        getForecast()
+        if ((myLocation != null)) {
+            Log.d(TAG, "starting NWS refresh")
+            getStation()
+            getConditions()
+            getForecast()
+        } else
+            Log.d(TAG, "skipping refresh because location isn't set")
     }
 
     private fun getStation() {
-        val latitude = myLocation.latitude
-        val longitude = myLocation.longitude
+        val latitude = myLocation!!.latitude
+        val longitude = myLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude/stations")
         val response = url.readText()
         val obj = JSONObject(response)
@@ -143,8 +148,8 @@ class NWSService {
     }
 
     private fun getGridPoint() {
-        val latitude = myLocation.latitude
-        val longitude = myLocation.longitude
+        val latitude = myLocation!!.latitude
+        val longitude = myLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude")
         val response = url.readText()
         val obj = JSONObject(response)

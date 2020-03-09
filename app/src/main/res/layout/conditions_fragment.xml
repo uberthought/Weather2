@@ -3,25 +3,27 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
     <data>
-        <variable name="viewModel" type="com.example.weather.ui.main.ConditionsViewModel"/>
+        <import type="android.view.View"/>
+        <import type="android.text.TextUtils"/>
+        <variable name="locationViewModel" type="com.example.weather.ui.main.LocationViewModel"/>
+        <variable name="conditionsViewModel" type="com.example.weather.ui.main.ConditionsViewModel"/>
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/design_default_color_primary"
+        android:background="@color/primaryLightColor"
         android:padding="8dp">
 
         <TextView
             android:id="@+id/location"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
-            android:textColor="@color/material_on_primary_emphasis_medium"
+            android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:text="@{viewModel.location}"
-            android:gravity="center"
+            android:text="@{locationViewModel.location}"
+            android:visibility="@{TextUtils.isEmpty(locationViewModel.location) ? View.GONE : View.VISIBLE}"
             tools:text="Location"/>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -39,12 +41,12 @@
         <TextView
             android:id="@+id/timestamp"
             android:textAppearance="@style/TextAppearance.MaterialComponents.Overline"
-            android:textColor="@color/material_on_primary_disabled"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:text="@{viewModel.timestamp}"
+            android:text="@{conditionsViewModel.timestamp}"
+            android:visibility="@{TextUtils.isEmpty(conditionsViewModel.timestamp) ? View.GONE : View.VISIBLE}"
             tools:text="timestamp"/>
 
 
