@@ -3,7 +3,7 @@ package com.example.weather.ui.main
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.weather.MainActivity
-import com.example.weather.NWSService
+import com.example.weather.Services.NWSService
 import java.text.SimpleDateFormat
 
 class ConditionsViewModel : ViewModel() {

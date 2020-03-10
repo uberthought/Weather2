@@ -1,10 +1,11 @@
-package com.example.weather
+package com.example.weather.Services
 
 import android.content.Context
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.work.*
+import com.example.weather.MainActivity
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -31,7 +32,9 @@ class NWSRefreshService(var appContext: AppCompatActivity) {
 
         Log.d(TAG, "request refresh every $refreshInterval minutes")
         val refreshWorkRequest =
-            PeriodicWorkRequest.Builder(Service::class.java, refreshInterval, TimeUnit.MINUTES)
+            PeriodicWorkRequest.Builder(
+                    Service::class.java,
+                    refreshInterval, TimeUnit.MINUTES)
                 .setConstraints(constrains)
                 .build()
         WorkManager.getInstance(appContext).enqueue(refreshWorkRequest)
@@ -44,7 +47,7 @@ class NWSRefreshService(var appContext: AppCompatActivity) {
             return CallbackToFutureAdapter.getFuture { resolver ->
                 GlobalScope.launch {
                     mutex.withLock {
-                        var duration = Date().time - timestamp
+                        val duration = Date().time - timestamp
                         if (duration > 1000 * 60 * 5) {
                             timestamp = Date().time
                             Log.d(TAG, "refresh NWS after $duration")

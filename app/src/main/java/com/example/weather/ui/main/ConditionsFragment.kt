@@ -43,8 +43,7 @@ class ConditionsFragment: Fragment() {
         val adapter = ConditionsAdapter()
         recyclerView.adapter = adapter
 
-        locationViewModel.location.observe(viewLifecycleOwner, Observer { location ->
-        })
+        locationViewModel.location.observe(viewLifecycleOwner, Observer { _ -> location.invalidate() })
         conditionsViewModel.dataViewModel.observe(viewLifecycleOwner, Observer { _ -> adapter.notifyDataSetChanged() })
         forecastViewModel.forecasts.observe(viewLifecycleOwner, Observer { _ -> adapter.notifyDataSetChanged() })
 

@@ -1,4 +1,4 @@
-package com.example.weather
+package com.example.weather.Services
 
 import android.annotation.SuppressLint
 import android.location.Location
@@ -63,20 +63,35 @@ class NWSService {
             GlobalScope.launch { refresh() }
         }
         else
-            Log.d(TAG, "mot refreshing since the location changes bt at less than 100m")
+            Log.d(TAG, "not refreshing since the location changes bt at less than 100m")
 
     }
 
-    fun refresh() {
+    companion object Mutex {
+        val mutex = Mutex()
+        const val refreshInterval:Long = 15
+        var timestamp: Long = 0
+    }
+
+    suspend fun refresh() {
         Log.d(TAG, "starting NWS refresh")
 
-        if ((myLocation != null)) {
-            Log.d(TAG, "starting NWS refresh")
-            getStation()
-            getConditions()
-            getForecast()
-        } else
-            Log.d(TAG, "skipping refresh because location isn't set")
+        mutex.withLock {
+            val duration = Date().time - timestamp
+            if (duration > 1000 * 60 * refreshInterval) {
+                timestamp = Date().time
+                if ((myLocation != null)) {
+                    Log.d(TAG, "starting NWS refresh")
+                    getStation()
+                    getConditions()
+                    getForecast()
+                }
+                else
+                    Log.d(TAG, "skipping refresh because location isn't set")
+            }
+            else
+                Log.d(TAG, "skipping refresh because refresing too soon")
+        }
     }
 
     private fun getStation() {
