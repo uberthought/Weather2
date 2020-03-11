@@ -45,10 +45,10 @@ class MainActivity : AppCompatActivity() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(applicationContext)
 
         if (ActivityCompat.checkSelfPermission(applicationContext,
-                Manifest.permission.ACCESS_COARSE_LOCATION
+                Manifest.permission.ACCESS_FINE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         )
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_REQUEST)
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), LOCATION_REQUEST)
         else
             requestLocationUpdates()
 
@@ -79,9 +79,9 @@ class MainActivity : AppCompatActivity() {
 
         val locationRequest = LocationRequest.create()
             ?.apply {
-                interval = 15000
-                fastestInterval = 5000
-                priority = LocationRequest.PRIORITY_LOW_POWER
+                interval = 1000 * 60 * 5
+                fastestInterval = 1000 * 60 * 15
+                priority = LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
             }
 
         fusedLocationClient.requestLocationUpdates(locationRequest,

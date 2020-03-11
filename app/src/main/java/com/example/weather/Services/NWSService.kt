@@ -28,7 +28,7 @@ class NWSService {
     private var gridX: Int? = null
     private var gridY: Int? = null
     private var gridWFO: String? = null
-    private var myLocation:Location? = null
+    private var lastLocation:Location? = null
     private var baseURL = "https://api.weather.gov"
 
     class Conditions {
@@ -63,10 +63,11 @@ class NWSService {
 
     fun setLocation(location: Location) {
         Log.d(tag, "got update from location service")
-        if (myLocation == null || myLocation!!.distanceTo(location) > 100  ) {
+        if (lastLocation == null || lastLocation!!.distanceTo(location) > 100  ) {
             Log.d(tag, "refreshing since the location changes by greater than 100m")
-            this.myLocation = location
+            lastLocation = Location(location)
             stationId = null
+            timestamp = 0
             GlobalScope.launch { refresh() }
         }
         else
@@ -81,7 +82,7 @@ class NWSService {
             val duration = Date().time - timestamp
             if (duration > 1000 * 60 * refreshInterval) {
                 timestamp = Date().time
-                if ((myLocation != null)) {
+                if ((lastLocation != null)) {
                     Log.d(tag, "starting NWS refresh")
                     getStation()
                     getConditions()
@@ -96,8 +97,8 @@ class NWSService {
     }
 
     private fun getStation() {
-        val latitude = myLocation!!.latitude
-        val longitude = myLocation!!.longitude
+        val latitude = lastLocation!!.latitude
+        val longitude = lastLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude/stations")
         val response = url.readText()
         val obj = JSONObject(response)
@@ -164,8 +165,8 @@ class NWSService {
     }
 
     private fun getGridPoint() {
-        val latitude = myLocation!!.latitude
-        val longitude = myLocation!!.longitude
+        val latitude = lastLocation!!.latitude
+        val longitude = lastLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude")
         val response = url.readText()
         val obj = JSONObject(response)
