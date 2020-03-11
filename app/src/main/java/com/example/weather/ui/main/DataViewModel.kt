@@ -1,6 +1,5 @@
 package com.example.weather.ui.main
 
-import android.view.View
 import androidx.lifecycle.ViewModel
 import com.example.weather.R
 

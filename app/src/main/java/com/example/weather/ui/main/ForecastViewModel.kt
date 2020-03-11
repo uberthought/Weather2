@@ -2,16 +2,15 @@ package com.example.weather.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.weather.MainActivity
-import com.example.weather.Services.NWSService
 import com.example.weather.R
+import com.example.weather.Services.NWSService
 
 class ForecastViewModel : ViewModel() {
     val forecasts: MutableLiveData<MutableList<DataViewModel>> =
         MutableLiveData()
 
     init {
-        MainActivity.nwsService.forecast.observeForever { forecast -> onForecastChanged(forecast) }
+        NWSService.instance.forecast.observeForever { forecast -> onForecastChanged(forecast) }
     }
 
     private fun onForecastChanged(nwsForecast: NWSService.Forecast) {

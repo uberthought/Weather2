@@ -1,18 +1,17 @@
 package com.example.weather
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
 import com.example.weather.Services.LocationServices
 import com.example.weather.Services.NWSRefreshService
-import com.example.weather.Services.NWSService
 import com.example.weather.ui.main.ConditionsFragment
 
 class MainActivity : AppCompatActivity() {
-    private val TAG = javaClass.kotlin.qualifiedName
+    private val tag = javaClass.kotlin.qualifiedName
 
-    companion object NWSService {
-        var nwsService = NWSService()
-    }
+    private lateinit var locationServices: LocationServices
+    private lateinit var nwsRefreshService: NWSRefreshService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,13 +22,20 @@ class MainActivity : AppCompatActivity() {
                 .commitNow()
         }
 
-        val locationServices =
-            LocationServices(this)
-        locationServices.begin()
-
-        val nwsRefreshService =
-            NWSRefreshService(this)
-        nwsRefreshService.begin()
+        locationServices = LocationServices(this)
+        nwsRefreshService = NWSRefreshService(this)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            LocationServices.LOCATION_REQUEST -> {
+                Log.d(tag, "got user permission")
+                locationServices.onRequestPermissionsResult()
+            }
+            else -> {
+                Log.d(tag, "failed to get user permission")
+            }
+        }
+    }
 }

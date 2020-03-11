@@ -2,7 +2,6 @@ package com.example.weather.ui.main
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.example.weather.MainActivity
 import com.example.weather.Services.NWSService
 import java.text.SimpleDateFormat
 
@@ -11,7 +10,7 @@ class ConditionsViewModel : ViewModel() {
     val dataViewModel: MutableLiveData<DataViewModel> = MutableLiveData()
 
     init {
-        MainActivity.nwsService.conditions.observeForever { conditions -> onConditionsChanged(conditions) }
+        NWSService.instance.conditions.observeForever { conditions -> onConditionsChanged(conditions) }
     }
 
     private fun onConditionsChanged(nwsConditions: NWSService.Conditions) {
@@ -101,8 +100,8 @@ class ConditionsViewModel : ViewModel() {
 
     private fun getWindChill(nwsConditions: NWSService.Conditions):String? {
         nwsConditions.windChill ?: return null
-        val farenheit = toFahrenheit(nwsConditions.windChill!!)
-        return "Wind Chill %.0f℉".format(farenheit)
+        val fahrenheit = toFahrenheit(nwsConditions.windChill!!)
+        return "Wind Chill %.0f℉".format(fahrenheit)
     }
 
     private fun getHeatIndex(nwsConditions: NWSService.Conditions):String? {

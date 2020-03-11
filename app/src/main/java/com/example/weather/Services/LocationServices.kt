@@ -6,81 +6,57 @@ import android.os.Looper
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import com.example.weather.MainActivity
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 
-class LocationServices(var appContext: AppCompatActivity) :
-    ActivityCompat.OnRequestPermissionsResultCallback {
-    private val TAG = javaClass.kotlin.qualifiedName
+class LocationServices(private var appContext: AppCompatActivity) {
+    private val tag = javaClass.kotlin.qualifiedName
 
-    var LOCATION_REQUEST: Int = 1
+    companion object {
+        const val LOCATION_REQUEST: Int = 1
+    }
 
-    fun begin() {
+    init {
         if (ActivityCompat.checkSelfPermission(appContext,
-                Manifest.permission.ACCESS_FINE_LOCATION
+                Manifest.permission.ACCESS_COARSE_LOCATION
             ) != PackageManager.PERMISSION_GRANTED
         )
-            ActivityCompat.requestPermissions(
-                appContext,
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_REQUEST
-            )
+            ActivityCompat.requestPermissions(appContext, arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION), LOCATION_REQUEST)
         else
             requestLocationUpdates()
     }
 
-    fun requestLocationUpdates() {
-        val fusedLocationClient =
-            LocationServices.getFusedLocationProviderClient(
-                appContext
-            )
-
+    private fun requestLocationUpdates() {
         val locationCallback = object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
                 for (location in locationResult.locations) {
-                    MainActivity.nwsService.setLocation(location)
+                    NWSService.instance.setLocation(location)
                 }
             }
         }
 
         val locationRequest = LocationRequest.create()
             ?.apply {
-            var interval = 15000
+            interval = 15000
             fastestInterval = 5000
-            priority =
-                LocationRequest.PRIORITY_HIGH_ACCURACY
+            priority = LocationRequest.PRIORITY_LOW_POWER
         }
 
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
         fusedLocationClient.requestLocationUpdates(locationRequest,
             locationCallback,
             Looper.getMainLooper()
         )
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        Log.d(TAG, "callback from user permission")
-        when (requestCode) {
-            LOCATION_REQUEST -> {
-                Log.d(TAG, "got user permission")
-                val nwsRefreshService =
-                    NWSRefreshService(appContext)
-                nwsRefreshService.begin()
-            }
-            else -> {
-                Log.d(TAG, "failed to get user permission")
-            }
+    fun onRequestPermissionsResult() {
+        Log.d(tag, "got user permission")
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(appContext)
+        fusedLocationClient.lastLocation.addOnSuccessListener { location ->
+            NWSService.instance.setLocation(location)
         }
-
-        val refreshService =
-            NWSRefreshService(appContext)
-        refreshService.begin()
     }
 }

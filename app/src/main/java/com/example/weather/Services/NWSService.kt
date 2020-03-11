@@ -14,8 +14,15 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class NWSService {
-    private val TAG = javaClass.kotlin.qualifiedName
+    private val tag = javaClass.kotlin.qualifiedName
 
+    companion object Mutex {
+        val instance = NWSService()
+
+        val mutex = Mutex()
+        const val refreshInterval:Long = 15
+        var timestamp: Long = 0
+    }
 
     private var stationId: String? = null
     private var gridX: Int? = null
@@ -55,42 +62,36 @@ class NWSService {
     var forecast: MutableLiveData<Forecast> = MutableLiveData()
 
     fun setLocation(location: Location) {
-        Log.d(TAG, "got update from location service")
+        Log.d(tag, "got update from location service")
         if (myLocation == null || myLocation!!.distanceTo(location) > 100  ) {
-            Log.d(TAG, "refresking since the location changes by greater than 100m")
+            Log.d(tag, "refreshing since the location changes by greater than 100m")
             this.myLocation = location
             stationId = null
             GlobalScope.launch { refresh() }
         }
         else
-            Log.d(TAG, "not refreshing since the location changes bt at less than 100m")
+            Log.d(tag, "not refreshing since the location changes bt at less than 100m")
 
-    }
-
-    companion object Mutex {
-        val mutex = Mutex()
-        const val refreshInterval:Long = 15
-        var timestamp: Long = 0
     }
 
     suspend fun refresh() {
-        Log.d(TAG, "starting NWS refresh")
+        Log.d(tag, "starting NWS refresh")
 
         mutex.withLock {
             val duration = Date().time - timestamp
             if (duration > 1000 * 60 * refreshInterval) {
                 timestamp = Date().time
                 if ((myLocation != null)) {
-                    Log.d(TAG, "starting NWS refresh")
+                    Log.d(tag, "starting NWS refresh")
                     getStation()
                     getConditions()
                     getForecast()
                 }
                 else
-                    Log.d(TAG, "skipping refresh because location isn't set")
+                    Log.d(tag, "skipping refresh because location isn't set")
             }
             else
-                Log.d(TAG, "skipping refresh because refresing too soon")
+                Log.d(tag, "skipping refresh because refreshing too soon")
         }
     }
 

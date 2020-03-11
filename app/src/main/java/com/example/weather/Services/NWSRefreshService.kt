@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.work.*
-import com.example.weather.MainActivity
 import com.google.common.util.concurrent.ListenableFuture
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -14,8 +13,8 @@ import kotlinx.coroutines.sync.withLock
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-class NWSRefreshService(var appContext: AppCompatActivity) {
-    private val TAG = javaClass.kotlin.qualifiedName
+class NWSRefreshService(private var appContext: AppCompatActivity) {
+    private val tag = javaClass.kotlin.qualifiedName
 
     companion object Mutex {
         val mutex = Mutex()
@@ -23,25 +22,22 @@ class NWSRefreshService(var appContext: AppCompatActivity) {
         var timestamp: Long = 0
     }
 
-    fun begin() {
-        Log.d(TAG, "setup constraints so we don't hammer the device")
+    init {
+        Log.d(tag, "setup constraints so we don't hammer the device")
         val constrains = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)
             .setRequiresBatteryNotLow(true)
             .build()
 
-        Log.d(TAG, "request refresh every $refreshInterval minutes")
-        val refreshWorkRequest =
-            PeriodicWorkRequest.Builder(
-                    Service::class.java,
-                    refreshInterval, TimeUnit.MINUTES)
+        Log.d(tag, "request refresh every $refreshInterval minutes")
+        val refreshWorkRequest = PeriodicWorkRequest.Builder(Service::class.java, refreshInterval, TimeUnit.MINUTES)
                 .setConstraints(constrains)
                 .build()
         WorkManager.getInstance(appContext).enqueue(refreshWorkRequest)
     }
 
     class Service(appContext: Context, workerParams: WorkerParameters) : ListenableWorker(appContext, workerParams) {
-        private val TAG = javaClass.kotlin.qualifiedName
+        private val tag = javaClass.kotlin.qualifiedName
 
         override fun startWork(): ListenableFuture<Result> {
             return CallbackToFutureAdapter.getFuture { resolver ->
@@ -50,10 +46,10 @@ class NWSRefreshService(var appContext: AppCompatActivity) {
                         val duration = Date().time - timestamp
                         if (duration > 1000 * 60 * 5) {
                             timestamp = Date().time
-                            Log.d(TAG, "refresh NWS after $duration")
-                            MainActivity.nwsService.refresh()
+                            Log.d(tag, "refresh NWS after $duration")
+                            NWSService.instance.refresh()
                         } else
-                            Log.d(TAG, "trying to refresh NWS too soon $duration")
+                            Log.d(tag, "trying to refresh NWS too soon $duration")
 
                         resolver.set(Result.success())
                     }

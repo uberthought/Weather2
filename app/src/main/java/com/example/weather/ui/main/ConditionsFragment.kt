@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.databinding.ConditionsCardBinding
-import com.example.weather.databinding.ConditionsCardBinding.bind
 import com.example.weather.databinding.ConditionsCardBinding.inflate
 import com.example.weather.databinding.ConditionsFragmentBinding
 import com.example.weather.databinding.DetailedConditionsCardBinding
@@ -23,9 +22,9 @@ import kotlinx.android.synthetic.main.conditions_fragment.view.*
 
 class ConditionsFragment: Fragment() {
 
-    lateinit var locationViewModel: LocationViewModel
-    lateinit var conditionsViewModel: ConditionsViewModel
-    lateinit var forecastViewModel: ForecastViewModel
+    private lateinit var locationViewModel: LocationViewModel
+    private lateinit var conditionsViewModel: ConditionsViewModel
+    private lateinit var forecastViewModel: ForecastViewModel
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         locationViewModel = ViewModelProvider(this)[LocationViewModel::class.java]
@@ -43,9 +42,9 @@ class ConditionsFragment: Fragment() {
         val adapter = ConditionsAdapter()
         recyclerView.adapter = adapter
 
-        locationViewModel.location.observe(viewLifecycleOwner, Observer { _ -> location.invalidate() })
-        conditionsViewModel.dataViewModel.observe(viewLifecycleOwner, Observer { _ -> adapter.notifyDataSetChanged() })
-        forecastViewModel.forecasts.observe(viewLifecycleOwner, Observer { _ -> adapter.notifyDataSetChanged() })
+        locationViewModel.location.observe(viewLifecycleOwner, Observer { location.invalidate() })
+        conditionsViewModel.dataViewModel.observe(viewLifecycleOwner, Observer { adapter.notifyDataSetChanged() })
+        forecastViewModel.forecasts.observe(viewLifecycleOwner, Observer { adapter.notifyDataSetChanged() })
 
         return binding.root
     }
@@ -79,7 +78,7 @@ class ConditionsFragment: Fragment() {
             viewHolder.bind(viewModel)
         }
 
-        inner class ViewHolder(val binding: ConditionsCardBinding) : RecyclerView.ViewHolder(binding.root) {
+        inner class ViewHolder(private val binding: ConditionsCardBinding) : RecyclerView.ViewHolder(binding.root) {
 
             fun bind(viewModel:DataViewModel) {
                 binding.viewModel = viewModel
