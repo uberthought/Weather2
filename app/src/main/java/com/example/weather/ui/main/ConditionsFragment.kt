@@ -1,21 +1,21 @@
 package com.example.weather.ui.main
 
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.PopupWindow
+import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.FragmentNavigatorExtras
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weather.databinding.ConditionsCardBinding
 import com.example.weather.databinding.ConditionsCardBinding.inflate
 import com.example.weather.databinding.ConditionsFragmentBinding
-import com.example.weather.databinding.DetailedConditionsCardBinding
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.conditions_fragment.*
 import kotlinx.android.synthetic.main.conditions_fragment.view.*
@@ -40,7 +40,14 @@ class ConditionsFragment: Fragment() {
         recyclerView.addItemDecoration(itemDecor)
         recyclerView.layoutManager = LinearLayoutManager(activity)
         val adapter = ConditionsAdapter()
-        recyclerView.adapter = adapter
+        recyclerView.apply {
+            this.adapter = adapter
+            postponeEnterTransition()
+            viewTreeObserver.addOnPreDrawListener {
+                startPostponedEnterTransition()
+                true
+            }
+        }
 
         locationViewModel.location.observe(viewLifecycleOwner, Observer { location.invalidate() })
         conditionsViewModel.dataViewModel.observe(viewLifecycleOwner, Observer { adapter.notifyDataSetChanged() })
@@ -67,50 +74,57 @@ class ConditionsFragment: Fragment() {
             return count
         }
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, index: Int) {
             val viewHolder = holder as ViewHolder
-            val viewModel = when {
-                conditionsViewModel.dataViewModel.value != null && position == 0 -> conditionsViewModel.dataViewModel.value!!
-                conditionsViewModel.dataViewModel.value == null -> forecastViewModel.forecasts.value!![position]
-                forecastViewModel.forecasts.value != null -> forecastViewModel.forecasts.value!![position - 1]
-                else -> DataViewModel()
-            }
-            viewHolder.bind(viewModel)
+            viewHolder.bind(index)
         }
 
         inner class ViewHolder(private val binding: ConditionsCardBinding) : RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(viewModel:DataViewModel) {
+            private var index: Int = -1
+            private lateinit var viewModel: DataViewModel
+
+            fun bind(index: Int) {
+                this.index = index
+
+                viewModel = when {
+                    conditionsViewModel.dataViewModel.value != null && index == 0 -> conditionsViewModel.dataViewModel.value!!
+                    conditionsViewModel.dataViewModel.value == null -> forecastViewModel.forecasts.value!![index]
+                    forecastViewModel.forecasts.value != null -> forecastViewModel.forecasts.value!![index - 1]
+                    else -> DataViewModel()
+                }
+
                 binding.viewModel = viewModel
                 binding.viewHolder = this
+                ViewCompat.setTransitionName(binding.title, "title_$index")
+                ViewCompat.setTransitionName(binding.icon, "icon_$index")
+                ViewCompat.setTransitionName(binding.temperature, "temperature_$index")
+                ViewCompat.setTransitionName(binding.temperatureLabel, "temperatureLabel_$index")
+                ViewCompat.setTransitionName(binding.wind, "wind_$index")
+                ViewCompat.setTransitionName(binding.shortDescription, "shortDescription_$index")
+                ViewCompat.setTransitionName(binding.dewPoint, "dewPoint_$index")
+                ViewCompat.setTransitionName(binding.windGust, "windGust_$index")
+                ViewCompat.setTransitionName(binding.relativeHumidity, "relativeHumidity_$index")
 
                 if (viewModel.icon != null)
                     Picasso.with(context).load(viewModel.icon!!).into(binding.icon)
             }
 
             fun onClick(view:View) {
-                val recyclerView = this@ConditionsFragment.view!!.recyclerView as RecyclerView
-                val position = recyclerView.getChildLayoutPosition(view)
+                val extras = FragmentNavigatorExtras(
+                    binding.title to "title_$index",
+                    binding.icon to "icon_$index",
+                    binding.temperature to "temperature_$index",
+                    binding.temperatureLabel to "temperatureLabel_$index",
+                    binding.wind to "wind_$index",
+                    binding.shortDescription to "shortDescription_$index",
+                    binding.dewPoint to "dewPoint_$index",
+                    binding.windGust to "windGust_$index",
+                    binding.relativeHumidity to "relativeHumidity_$index"
+                )
 
-                val inflater = LayoutInflater.from(context)
-                val binding = DetailedConditionsCardBinding.inflate(inflater)
-                val viewModel = when {
-                    conditionsViewModel.dataViewModel.value != null && position == 0 -> conditionsViewModel.dataViewModel.value!!
-                    conditionsViewModel.dataViewModel.value == null -> forecastViewModel.forecasts.value!![position]
-                    forecastViewModel.forecasts.value != null -> forecastViewModel.forecasts.value!![position - 1]
-                    else -> DataViewModel()
-                }
-                binding.viewModel = viewModel
-
-                if (viewModel.icon != null)
-                    Picasso.with(context).load(viewModel.icon!!).into(binding.icon)
-
-                val pw = PopupWindow(binding.root, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, true)
-                pw.setTouchInterceptor { _, _ ->
-                    pw.dismiss()
-                    true
-                }
-                pw.showAtLocation(this@ConditionsFragment.view, Gravity.CENTER, 0, 0)
+                val action = ConditionsFragmentDirections.actionConditionsFragmentToDetailedConditions(index)
+                findNavController().navigate(action, extras)
             }
         }
     }

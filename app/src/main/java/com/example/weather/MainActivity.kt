@@ -11,7 +11,6 @@ import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.core.app.ActivityCompat
 import androidx.work.*
 import com.example.weather.Services.NWSService
-import com.example.weather.ui.main.ConditionsFragment
 import com.google.android.gms.location.*
 import com.google.android.gms.location.LocationServices
 import com.google.common.util.concurrent.ListenableFuture
@@ -23,7 +22,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {
-    private val tag = javaClass.kotlin.qualifiedName
+    private val logTag = javaClass.kotlin.qualifiedName
 
     companion object {
         const val LOCATION_REQUEST: Int = 1
@@ -34,11 +33,6 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity)
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, ConditionsFragment())
-                .commitNow()
-        }
 
         // location
 
@@ -52,7 +46,7 @@ class MainActivity : AppCompatActivity() {
         else
             requestLocationUpdates()
 
-        Log.d(tag, "setup constraints so we don't hammer the device")
+        Log.d(logTag, "setup constraints so we don't hammer the device")
         val constrains = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.UNMETERED)
             .setRequiresBatteryNotLow(true)
@@ -60,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         // refresh timer
 
-        Log.d(tag, "request refresh every ${RefreshService.refreshInterval} minutes")
+        Log.d(logTag, "request refresh every ${RefreshService.refreshInterval} minutes")
         val refreshWorkRequest = PeriodicWorkRequest.Builder(RefreshService::class.java, RefreshService.refreshInterval, TimeUnit.MINUTES)
             .setConstraints(constrains)
             .build()
@@ -94,19 +88,19 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             LOCATION_REQUEST -> {
-                Log.d(tag, "got user permission")
+                Log.d(logTag, "got user permission")
                 fusedLocationClient.lastLocation.addOnSuccessListener { location ->
                     NWSService.instance.setLocation(location)
                 }
             }
             else -> {
-                Log.d(tag, "failed to get user permission")
+                Log.d(logTag, "failed to get user permission")
             }
         }
     }
 
     class RefreshService(appContext: Context, workerParams: WorkerParameters) : ListenableWorker(appContext, workerParams) {
-        private val tag = javaClass.kotlin.qualifiedName
+        private val logTag = javaClass.kotlin.qualifiedName
 
         companion object {
             val mutex = Mutex()
@@ -121,10 +115,10 @@ class MainActivity : AppCompatActivity() {
                         val duration = Date().time - timestamp
                         if (duration > 1000 * 60 * 5) {
                             timestamp = Date().time
-                            Log.d(tag, "refresh NWS after $duration")
+                            Log.d(logTag, "refresh NWS after $duration")
                             GlobalScope.launch { NWSService.instance.refresh() }
                         } else
-                            Log.d(tag, "trying to refresh NWS too soon $duration")
+                            Log.d(logTag, "trying to refresh NWS too soon $duration")
 
                         resolver.set(Result.success())
                     }

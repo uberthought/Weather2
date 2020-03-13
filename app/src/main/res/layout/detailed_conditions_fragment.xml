@@ -6,52 +6,62 @@
     <data>
         <import type="android.view.View"/>
         <import type="android.text.TextUtils"/>
-        <variable name="viewHolder" type="com.example.weather.ui.main.ConditionsFragment.ConditionsAdapter.ViewHolder"/>
+        <variable name="fragment" type="com.example.weather.ui.main.DetailedConditionsFragment"/>
         <variable name="viewModel" type="com.example.weather.ui.main.DataViewModel"/>
     </data>
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/conditionsCard"
-        style="@style/Widget.MaterialComponents.CardView"
-        app:strokeWidth="1dp"
-        app:strokeColor="@color/primaryDarkColor"
-        app:cardBackgroundColor="@{context.getColor(viewModel.backgroundColor)}"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="@{viewHolder::onClick}">
+        android:layout_height="match_parent"
+        android:background="@color/primaryLightColor"
+        android:padding="8dp"
+        android:onClick="@{fragment::onClick}">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/conditionsCard"
+            style="@style/Widget.MaterialComponents.CardView"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/primaryDarkColor"
+            app:cardBackgroundColor="@{context.getColor(viewModel.backgroundColor)}"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="8dp">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <androidx.constraintlayout.widget.Guideline
-                android:id="@+id/centerGuideline"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical"
-                app:layout_constraintGuide_percent="0.6"/>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <TextView
                 android:id="@+id/title"
                 android:textAppearance="@style/TextAppearance.MaterialComponents.Headline6"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toTopOf="parent"
                 tools:text="this is a really long title used to test wrapping"
                 android:text="@{viewModel.title}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.title) ? View.GONE : View.VISIBLE}"/>
+
+            <ImageView
+                android:id="@+id/icon"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                tools:layout_height="150dp"
+                tools:layout_width="150dp"
+                android:contentDescription="@string/icon"
+                android:visibility="@{viewModel.icon.equals(null) ? View.GONE : View.VISIBLE}"/>
 
             <LinearLayout
                 android:id="@+id/temperatureLayout"
                 android:orientation="horizontal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@id/title"
                 android:visibility="@{TextUtils.isEmpty(viewModel.temperature) ? View.GONE : View.VISIBLE}">
 
                 <TextView
@@ -74,9 +84,6 @@
                 android:id="@+id/wind"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@id/temperatureLayout"
                 android:text="@{viewModel.wind}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.wind) ? View.GONE : View.VISIBLE}"
                 tools:text="wind"/>
@@ -85,9 +92,6 @@
                 android:id="@+id/windGust"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@+id/wind"
                 android:text="@{viewModel.windGust}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.windGust) ? View.GONE : View.VISIBLE}"
                 tools:text="windGust" />
@@ -96,9 +100,6 @@
                 android:id="@+id/windChill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@+id/windGust"
                 android:text="@{viewModel.windChill}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.windChill) ? View.GONE : View.VISIBLE}"
                 tools:text="windGust" />
@@ -107,9 +108,6 @@
                 android:id="@+id/heatIndex"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@+id/windChill"
                 android:text="@{viewModel.heatIndex}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.heatIndex) ? View.GONE : View.VISIBLE}"
                 tools:text="windGust" />
@@ -118,9 +116,6 @@
                 android:id="@+id/dewPoint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@+id/heatIndex"
                 android:text="@{viewModel.dewPoint}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.dewPoint) ? View.GONE : View.VISIBLE}"
                 tools:text="dewPoint" />
@@ -129,9 +124,6 @@
                 android:id="@+id/relativeHumidity"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@+id/dewPoint"
                 android:text="@{viewModel.relativeHumidity}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.relativeHumidity) ? View.GONE : View.VISIBLE}"
                 tools:text="relativeHumidity" />
@@ -140,10 +132,6 @@
                 android:id="@+id/shortDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@id/relativeHumidity"
-                app:layout_constrainedWidth="true"
                 android:text="@{viewModel.shortDescription}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.shortDescription) ? View.GONE : View.VISIBLE}"
                 tools:text="shortDescription"/>
@@ -152,10 +140,6 @@
                 android:id="@+id/visibility"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@id/shortDescription"
-                app:layout_constrainedWidth="true"
                 android:text="@{viewModel.visibility}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.visibility) ? View.GONE : View.VISIBLE}"
                 tools:text="visibility"/>
@@ -164,10 +148,6 @@
                 android:id="@+id/pressure"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@id/visibility"
-                app:layout_constrainedWidth="true"
                 android:text="@{viewModel.pressure}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.pressure) ? View.GONE : View.VISIBLE}"
                 tools:text="pressure"/>
@@ -176,27 +156,14 @@
                 android:id="@+id/detailedDescription"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/centerGuideline"
-                app:layout_constraintTop_toBottomOf="@id/pressure"
-                app:layout_constrainedWidth="true"
                 android:text="@{viewModel.detailedDescription}"
                 android:visibility="@{TextUtils.isEmpty(viewModel.detailedDescription) ? View.GONE : View.VISIBLE}"
                 tools:text="detailedDescription"/>
 
-            <ImageView
-                android:id="@+id/icon"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                tools:layout_height="100dp"
-                tools:layout_width="100dp"
-                app:layout_constraintStart_toStartOf="@id/centerGuideline"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:contentDescription="@string/icon"
-                android:visibility="@{viewModel.icon.equals(null) ? View.GONE : View.VISIBLE}"/>
+        </LinearLayout>
 
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </com.google.android.material.card.MaterialCardView>
+        </com.google.android.material.card.MaterialCardView>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

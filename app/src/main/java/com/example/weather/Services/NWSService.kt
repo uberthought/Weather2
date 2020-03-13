@@ -1,9 +1,11 @@
 package com.example.weather.Services
 
+import NWSPoints
 import android.annotation.SuppressLint
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -14,7 +16,7 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 class NWSService {
-    private val tag = javaClass.kotlin.qualifiedName
+    private val logTag = javaClass.kotlin.qualifiedName
 
     companion object Mutex {
         val instance = NWSService()
@@ -62,37 +64,37 @@ class NWSService {
     var forecast: MutableLiveData<Forecast> = MutableLiveData()
 
     fun setLocation(location: Location) {
-        Log.d(tag, "got update from location service")
+        Log.d(logTag, "got update from location service")
         if (lastLocation == null || lastLocation!!.distanceTo(location) > 100  ) {
-            Log.d(tag, "refreshing since the location changes by greater than 100m")
+            Log.d(logTag, "refreshing since the location changes by greater than 100m")
             lastLocation = Location(location)
             stationId = null
             timestamp = 0
             GlobalScope.launch { refresh() }
         }
         else
-            Log.d(tag, "not refreshing since the location changes bt at less than 100m")
+            Log.d(logTag, "not refreshing since the location changes bt at less than 100m")
 
     }
 
     suspend fun refresh() {
-        Log.d(tag, "starting NWS refresh")
+        Log.d(logTag, "starting NWS refresh")
 
         mutex.withLock {
             val duration = Date().time - timestamp
             if (duration > 1000 * 60 * refreshInterval) {
                 timestamp = Date().time
                 if ((lastLocation != null)) {
-                    Log.d(tag, "starting NWS refresh")
+                    Log.d(logTag, "starting NWS refresh")
                     getStation()
                     getConditions()
                     getForecast()
                 }
                 else
-                    Log.d(tag, "skipping refresh because location isn't set")
+                    Log.d(logTag, "skipping refresh because location isn't set")
             }
             else
-                Log.d(tag, "skipping refresh because refreshing too soon")
+                Log.d(logTag, "skipping refresh because refreshing too soon")
         }
     }
 
@@ -101,11 +103,9 @@ class NWSService {
         val longitude = lastLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude/stations")
         val response = url.readText()
-        val obj = JSONObject(response)
-        val properties = obj.getJSONArray("features").getJSONObject(0).getJSONObject("properties")
-
-        location.postValue(properties.getString("name"))
-        stationId = properties.getString("stationIdentifier")
+        val points = Gson().fromJson(response, NWSPoints.Base::class.java)
+        location.postValue(points.features[0].properties.name)
+        stationId = points.features[0].properties.stationIdentifier
     }
 
     @SuppressLint("SimpleDateFormat")
