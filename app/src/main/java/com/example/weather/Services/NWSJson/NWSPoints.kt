@@ -1,38 +1,54 @@
+package com.example.weather.Services.NWSJson
+
 import com.google.gson.annotations.SerializedName
 
-// https://www.json2kotlin.com/
-
 class NWSPoints {
-	data class Base(
-//		@SerializedName("@context") val context: List<String>,
-		@SerializedName("type") val type: String,
-		@SerializedName("features") val features: List<Features>,
-		@SerializedName("observationStations") val observationStations: List<String>
-	)
 
-	data class Features(
-		@SerializedName("id") val id: String,
-		@SerializedName("type") val type: String,
-		@SerializedName("geometry") val geometry: Geometry,
-		@SerializedName("properties") val properties: Properties
-	)
+    data class Root (
+//        val @context : List<String>,
+        val id : String,
+        val type : String,
+        val geometry : Geometry,
+        val properties : Properties
+    )
 
-	data class Geometry(
-		@SerializedName("type") val type: String,
-		@SerializedName("coordinates") val coordinates: List<Double>
-	)
+    data class Geometry (
+        val type : String,
+        val coordinates : List<Double>
+    )
 
-	data class Properties(
-		@SerializedName("@id") val id : String,
-		@SerializedName("@type") val type : String,
-		@SerializedName("elevation") val elevation: Elevation,
-		@SerializedName("stationIdentifier") val stationIdentifier: String,
-		@SerializedName("name") val name: String,
-		@SerializedName("timeZone") val timeZone: String
-	)
+    data class Properties (
+        @SerializedName("@id") val id : String,
+        @SerializedName("@type") val type : String,
+        val cwa : String,
+        val forecastOffice : String,
+        val gridX : Int,
+        val gridY : Int,
+        val forecast : String,
+        val forecastHourly : String,
+        val forecastGridData : String,
+        val observationStations : String,
+        val relativeLocation : RelativeLocation,
+        val forecastZone : String,
+        val county : String,
+        val fireWeatherZone : String,
+        val timeZone : String,
+        val radarStation : String
+    )
 
-	data class Elevation(
-		@SerializedName("value") val value: Double,
-		@SerializedName("unitCode") val unitCode: String
-	)
+    data class RelativeLocation (
+        val type : String,
+        val geometry : Geometry,
+        val properties : Properties
+    )
+
+    data class Bearing (
+        val value : Double?,
+        val unitCode : String
+    )
+
+    data class Distance (
+        val value : Double?,
+        val unitCode : String
+    )
 }

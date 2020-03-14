@@ -65,9 +65,7 @@ class MainActivity : AppCompatActivity() {
         val locationCallback = object: LocationCallback() {
             override fun onLocationResult(locationResult: LocationResult?) {
                 locationResult ?: return
-                for (location in locationResult.locations) {
-                    NWSService.instance.setLocation(location)
-                }
+                locationResult?.locations.map { NWSService.instance.setLocation(it) }
             }
         }
 

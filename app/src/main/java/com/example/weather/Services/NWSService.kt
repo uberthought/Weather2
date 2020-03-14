@@ -1,16 +1,18 @@
 package com.example.weather.Services
 
-import NWSPoints
+import NWSPointsStations
 import android.annotation.SuppressLint
 import android.location.Location
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.example.weather.Services.NWSJson.NWSGridPointsForecast
+import com.example.weather.Services.NWSJson.NWSPoints
+import com.example.weather.Services.NWSJson.NWSStationsObservations
 import com.google.gson.Gson
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import org.json.JSONObject
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -33,35 +35,37 @@ class NWSService {
     private var lastLocation:Location? = null
     private var baseURL = "https://api.weather.gov"
 
-    class Conditions {
-        var dewPoint: Double? = null
-        var relativeHumidity: Double? = null
-        var temperature: Double? = null
-        var windDirection: Double? = null
-        var windSpeed: Double? = null
-        var windGust: Double? = null
-        var icon:String? = null
-        var textDescription:String? = null
-        var barometricPressure:Double? = null
-        var visibility:Double? = null
-        var windChill:Double? = null
-        var heatIndex:Double? = null
-        var timestamp:Date? = null
-    }
+    data class Conditions (
+        val dewPoint: Double? = null,
+        val relativeHumidity: Double? = null,
+        val temperature: Double? = null,
+        val windDirection: Double? = null,
+        val windSpeed: Double? = null,
+        val windGust: Double? = null,
+        val icon:String? = null,
+        val textDescription:String? = null,
+        val barometricPressure:Double? = null,
+        val visibility:Double? = null,
+        val windChill:Double? = null,
+        val heatIndex:Double? = null,
+        val timestamp:Date? = null
+    )
 
-    class Forecast {
-        var names: MutableList<String> = mutableListOf()
-        var icons: MutableList<String> = mutableListOf()
-        var shortForecasts: MutableList<String> = mutableListOf()
-        var detailedForecasts: MutableList<String> = mutableListOf()
-        var temperatures: MutableList<String> = mutableListOf()
-        var windSpeeds: MutableList<String> = mutableListOf()
-        var windDirections: MutableList<String> = mutableListOf()
-    }
+    data class Forecast (
+        val name: String? = null,
+        val icon: String? = null,
+        val shortForecast: String? = null,
+        val detailedForecast: String? = null,
+        val temperature: Double? = null,
+        val windSpeed: String? = null,
+        val windDirection: String? = null,
+        val temperatureTrend: String? = null,
+        val isDaytime: Boolean = false
+    )
 
     var location: MutableLiveData<String> = MutableLiveData()
     var conditions: MutableLiveData<Conditions> = MutableLiveData()
-    var forecast: MutableLiveData<Forecast> = MutableLiveData()
+    var forecasts: MutableLiveData<List<Forecast>> = MutableLiveData()
 
     fun setLocation(location: Location) {
         Log.d(logTag, "got update from location service")
@@ -103,7 +107,7 @@ class NWSService {
         val longitude = lastLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude/stations")
         val response = url.readText()
-        val points = Gson().fromJson(response, NWSPoints.Base::class.java)
+        val points = Gson().fromJson(response, NWSPointsStations.Root::class.java)
         location.postValue(points.features[0].properties.name)
         stationId = points.features[0].properties.stationIdentifier
     }
@@ -112,56 +116,46 @@ class NWSService {
     private fun getConditions() {
         val url = URL("$baseURL/stations/$stationId/observations/latest?require_qc=false")
         val response = url.readText()
-        val obj = JSONObject(response)
-        val properties = obj.getJSONObject("properties")
+        val stations = Gson().fromJson(response, NWSStationsObservations.Root::class.java)
 
-        val conditions = Conditions()
-
-        conditions.dewPoint = properties.getJSONObject("dewpoint").getString("value").toDoubleOrNull()
-        conditions.relativeHumidity = properties.getJSONObject("relativeHumidity").getString("value").toDoubleOrNull()
-        conditions.temperature = properties.getJSONObject("temperature").getString("value").toDoubleOrNull()
-        conditions.windDirection = properties.getJSONObject("windDirection").getString("value").toDoubleOrNull()
-        conditions.windSpeed = properties.getJSONObject("windSpeed").getString("value").toDoubleOrNull()
-        conditions.windGust = properties.getJSONObject("windGust").getString("value").toDoubleOrNull()
-        conditions.icon = properties.getString("icon")
-        conditions.textDescription = properties.getString("textDescription")
-        conditions.barometricPressure = properties.getJSONObject("barometricPressure").getString("value").toDoubleOrNull()
-        conditions.visibility = properties.getJSONObject("visibility").getString("value").toDoubleOrNull()
-        conditions.windChill = properties.getJSONObject("windChill").getString("value").toDoubleOrNull()
-        conditions.heatIndex = properties.getJSONObject("heatIndex").getString("value").toDoubleOrNull()
-
-        val timestamp = properties.getString("timestamp")
-        if (timestamp.isNotEmpty())
-            conditions.timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sszzzzz").parse(timestamp)
-
-        this.conditions.postValue(conditions)
+        this.conditions.postValue(Conditions(
+            dewPoint = stations.properties.dewpoint.value,
+            relativeHumidity = stations.properties.relativeHumidity.value,
+            temperature = stations.properties.temperature.value,
+            windDirection = stations.properties.windDirection.value,
+            windSpeed = stations.properties.windSpeed.value,
+            windGust = stations.properties.windGust.value,
+            icon = stations.properties.icon,
+            textDescription = stations.properties.textDescription,
+            barometricPressure = stations.properties.barometricPressure.value,
+            visibility = stations.properties.visibility.value,
+            windChill = stations.properties.windChill.value,
+            heatIndex = stations.properties.heatIndex.value,
+            timestamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:sszzzzz").parse(stations.properties.timestamp)
+        ))
     }
 
     private fun getForecast() {
-        if (gridX == null || gridY == null || gridWFO == null)
+        if (listOf(gridX, gridY, gridWFO).any { it == null })
             getGridPoint()
 
         val url = URL("$baseURL/gridpoints/$gridWFO/$gridX,$gridY/forecast")
         val response = url.readText()
-        val obj = JSONObject(response)
-        val properties = obj.getJSONObject("properties")
+        val forecast = Gson().fromJson(response, NWSGridPointsForecast.Root::class.java)
 
-        val forecast = Forecast()
-
-        val periods = properties.getJSONArray("periods")
-        for (i in 0 until periods.length()) {
-            val period = periods.getJSONObject(i)
-
-            forecast.names.add(period.getString("name"))
-            forecast.icons.add(period.getString("icon"))
-            forecast.shortForecasts.add(period.getString("shortForecast"))
-            forecast.detailedForecasts.add(period.getString("detailedForecast"))
-            forecast.temperatures.add(period.getString("temperature"))
-            forecast.windSpeeds.add(period.getString("windSpeed"))
-            forecast.windDirections.add(period.getString("windDirection"))
-        }
-
-        this.forecast.postValue(forecast)
+        this.forecasts.postValue(forecast.properties.periods.map {
+            Forecast(
+                name = it.name,
+                icon = it.icon,
+                shortForecast = it.shortForecast,
+                detailedForecast = it.detailedForecast,
+                temperature = it.temperature,
+                windSpeed = it.windSpeed,
+                windDirection = it.windDirection,
+                temperatureTrend = it.temperatureTrend,
+                isDaytime = it.isDaytime
+            )
+        })
     }
 
     private fun getGridPoint() {
@@ -169,11 +163,10 @@ class NWSService {
         val longitude = lastLocation!!.longitude
         val url = URL("$baseURL/points/$latitude,$longitude")
         val response = url.readText()
-        val obj = JSONObject(response)
-        val properties = obj.getJSONObject("properties")
+        val points = Gson().fromJson(response, NWSPoints.Root::class.java)
 
-        gridWFO = properties.getString("cwa")
-        gridX = properties.getString("gridX").toIntOrNull()
-        gridY = properties.getString("gridY").toIntOrNull()
+        gridWFO = points.properties.cwa
+        gridX = points.properties.gridX
+        gridY = points.properties.gridY
     }
 }

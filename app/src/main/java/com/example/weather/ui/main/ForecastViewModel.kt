@@ -6,31 +6,23 @@ import com.example.weather.R
 import com.example.weather.Services.NWSService
 
 class ForecastViewModel : ViewModel() {
-    val forecasts: MutableLiveData<MutableList<DataViewModel>> =
-        MutableLiveData()
+    val forecasts: MutableLiveData<List<DataViewModel>> = MutableLiveData()
 
-    init {
-        NWSService.instance.forecast.observeForever { forecast -> onForecastChanged(forecast) }
-    }
+    init { NWSService.instance.forecasts.observeForever { forecasts -> onForecastsChanged(forecasts) } }
 
-    private fun onForecastChanged(nwsForecast: NWSService.Forecast) {
-        val isLowFirst = nwsForecast.names[0] == "Tonight" || nwsForecast.names[0] == "Overnight"
-        val forecasts = mutableListOf<DataViewModel>()
-        for (i in 0 until nwsForecast.names.count()) {
-            val isLow = isLowFirst xor (i % 2 == 1)
-            val forecast = DataViewModel()
-            with(forecast) {
-                title = nwsForecast.names[i]
-                icon = nwsForecast.icons[i]
-                shortDescription = nwsForecast.shortForecasts[i]
-                detailedDescription = nwsForecast.detailedForecasts[i]
-                temperatureLabel = if (isLow) "Low " else "Hi "
-                temperature = "${nwsForecast.temperatures[i]}℉"
-                wind = "Wind ${nwsForecast.windDirections[i]} ${nwsForecast.windSpeeds[i]}".replace("mph", "MPH")
-                backgroundColor = if (isLow) R.color.secondaryColor else R.color.primaryColor
-            }
-            forecasts.add(forecast)
-        }
-        this.forecasts.postValue(forecasts)
+    private fun onForecastsChanged(forecasts: List<NWSService.Forecast>) {
+        this.forecasts.postValue(forecasts.map {
+            DataViewModel(
+                title = it.name,
+                icon = it.icon,
+                shortDescription = it.shortForecast,
+                detailedDescription = it.detailedForecast,
+                temperatureLabel = if (it.isDaytime) "Hi " else "Low ",
+                temperature = "%.0f℉".format(it.temperature),
+                wind = "Wind ${it.windDirection} ${it.windSpeed}".replace("mph", "MPH"),
+                temperatureTrend = if (it.temperatureTrend == null) null else "(${it.temperatureTrend})",
+                backgroundColor = if (it.isDaytime) R.color.primaryColor else R.color.secondaryColor
+            )
+        })
     }
 }

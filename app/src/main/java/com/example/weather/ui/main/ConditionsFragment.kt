@@ -82,7 +82,7 @@ class ConditionsFragment: Fragment() {
         inner class ViewHolder(private val binding: ConditionsCardBinding) : RecyclerView.ViewHolder(binding.root) {
 
             private var index: Int = -1
-            private lateinit var viewModel: DataViewModel
+            lateinit var viewModel: DataViewModel
 
             fun bind(index: Int) {
                 this.index = index

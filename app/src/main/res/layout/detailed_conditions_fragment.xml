@@ -78,6 +78,14 @@
                     android:text="@{viewModel.temperature}"
                     tools:text="90F" />
 
+                <TextView
+                    android:id="@+id/temperatureTrend"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.temperatureTrend}"
+                    android:visibility="@{TextUtils.isEmpty(viewModel.temperatureTrend) ? View.GONE : View.VISIBLE}"
+                    tools:text="temperatureTrend"/>
+
             </LinearLayout>
 
             <TextView
